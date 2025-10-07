@@ -14,6 +14,7 @@
  * References:
  *   - Firebase Admin SDK Authentication: https://firebase.google.com/docs/admin/setup
  *   - Express Middleware Documentation: https://expressjs.com/en/guide/using-middleware.html
+ *   - ChatGPT (OpenAI): https://chatgpt.com/share/68e53700-3aa8-800f-b6f1-74d4cfe8ad4e
  */
 
 const admin = require("../services/firebase");

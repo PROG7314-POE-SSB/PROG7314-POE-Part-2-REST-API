@@ -22,6 +22,7 @@
  *   - Firebase Admin SDK: https://firebase.google.com/docs/admin/setup
  *   - dotenv Library: https://github.com/motdotla/dotenv
  *   - Node.js Process Signals: https://nodejs.org/api/process.html#signal-events
+ *   - ChatGPT (OpenAI): https://chatgpt.com/share/68e53700-3aa8-800f-b6f1-74d4cfe8ad4e
  */
 
 const express = require("express");
