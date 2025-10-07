@@ -13,7 +13,7 @@ function getItemsCollection(userId) {
 exports.addItem = async (req, res) => {
   try {
     const userId = req.user.uid;
-    const { title, description, imageUrl, expiryDate, quantity, category, location } = req.body;
+    const { title, description, imageUrl, expiryDate, quantity, category, location, unit } = req.body;
 
     if (!title || !quantity || !category || !location) {
       return res.status(400).json({ error: "Missing required fields" });
@@ -33,6 +33,7 @@ exports.addItem = async (req, res) => {
       location, // e.g., "FRIDGE", "FREEZER", "PANTRY"
       addedAt: admin.firestore.FieldValue.serverTimestamp(),
       last_updated: admin.firestore.FieldValue.serverTimestamp(),
+      unit
     };
 
     await newItemRef.set(itemData);
