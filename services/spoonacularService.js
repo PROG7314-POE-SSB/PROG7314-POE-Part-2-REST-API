@@ -1,3 +1,23 @@
+/*
+ * Code Attribution
+ *
+ * Purpose:
+ *   - Integrate the Spoonacular API for recipe search, filtering, and retrieval based on dietary preferences and allergies.
+ *   - Implement asynchronous recipe fetching using Node.js Promises and structured fallback logic.
+ *   - Manage environment variables securely with dotenv for API key configuration.
+ *
+ * Authors/Technologies Used:
+ *   - Spoonacular API SDK: Spoonacular API Team
+ *   - dotenv for configuration management: Motdotla (Open Source)
+ *   - Node.js platform and Promise-based asynchronous patterns
+ *
+ * References:
+ *   - Spoonacular API Documentation: https://spoonacular.com/food-api/docs
+ *   - Spoonacular Node.js SDK: https://www.npmjs.com/package/spoonacular
+ *   - dotenv Library: https://github.com/motdotla/dotenv
+ *   - Node.js Promises Guide: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
+ */
+
 const Spoonacular = require("spoonacular");
 require("dotenv").config();
 

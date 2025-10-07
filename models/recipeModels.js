@@ -1,3 +1,21 @@
+/*
+ * Code Attribution
+ *
+ * Purpose:
+ *   - Define structured models for representing recipes, ingredients, and instructions.
+ *   - Map Spoonacular API responses into consistent, simplified data models suitable for frontend use.
+ *   - Handle missing or incomplete data gracefully by providing default values and fallback logic.
+ *   - Include utilities for cleaning and formatting HTML content returned from the Spoonacular API.
+ *
+ * Authors/Technologies Used:
+ *   - Spoonacular API Integration: Spoonacular Open Source Community
+ *   - Node.js (JavaScript Classes, ES Modules): OpenJS Foundation
+ *
+ * References:
+ *   - Spoonacular API Documentation: https://spoonacular.com/food-api/docs
+ *   - Node.js Modules Documentation: https://nodejs.org/api/modules.html
+ */
+
 /**
  * Recipe ingredient model
  */

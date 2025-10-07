@@ -1,3 +1,29 @@
+/*
+ * Code Attribution
+ *
+ * Purpose:
+ *   - Set up an Express-based backend server with route management, middleware integration, and Firebase connectivity.
+ *   - Implement dynamic localtunnel creation for secure public exposure of the local server in development mode.
+ *   - Perform Firebase health checks to ensure Firestore and Auth services are operational before API usage.
+ *   - Manage configuration securely through environment variables.
+ *
+ * Authors/Technologies Used:
+ *   - Express Framework: OpenJS Foundation
+ *   - CORS Middleware: Express.js Community
+ *   - Localtunnel: n8n Open Source Team
+ *   - Firebase Admin SDK: Google Firebase Team
+ *   - dotenv for environment configuration: Motdotla (Open Source)
+ *   - Node.js platform utilities
+ *
+ * References:
+ *   - Express Framework: https://expressjs.com/
+ *   - CORS Middleware: https://github.com/expressjs/cors
+ *   - Localtunnel Documentation: https://github.com/localtunnel/localtunnel
+ *   - Firebase Admin SDK: https://firebase.google.com/docs/admin/setup
+ *   - dotenv Library: https://github.com/motdotla/dotenv
+ *   - Node.js Process Signals: https://nodejs.org/api/process.html#signal-events
+ */
+
 const express = require("express");
 const cors = require("cors");
 const localtunnel = require("@n8n/localtunnel");
