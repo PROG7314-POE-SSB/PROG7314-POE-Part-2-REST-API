@@ -10,6 +10,56 @@ class SpoonacularService {
   }
 
   /**
+   * Get detailed recipe information by ID
+   */
+  async getRecipeInformation(recipeId) {
+    try {
+      console.log(`Fetching recipe information for ID: ${recipeId}`);
+
+      const opts = {
+        includeNutrition: false, // We don't need nutrition data for now
+        addWinePairing: false, // We don't need wine pairing
+        addTasteData: false, // We don't need taste data
+      };
+
+      return new Promise((resolve, reject) => {
+        this.recipesApi.getRecipeInformation(
+          recipeId,
+          opts,
+          (error, data, response) => {
+            if (error) {
+              console.error(
+                "Spoonacular getRecipeInformation API call failed:",
+                error
+              );
+              reject(error);
+            } else {
+              console.log(
+                `Recipe information API call successful for ID: ${recipeId}`
+              );
+              console.log("Recipe title:", data?.title);
+              console.log(
+                "Has extendedIngredients?",
+                !!data?.extendedIngredients
+              );
+              console.log(
+                "Has analyzedInstructions?",
+                !!data?.analyzedInstructions
+              );
+              console.log("Has summary?", !!data?.summary);
+              resolve(data);
+            }
+          }
+        );
+      });
+    } catch (error) {
+      throw new Error(
+        `Spoonacular recipe information API error: ${error.message}`
+      );
+    }
+  }
+
+  /**
    * Get random recipes based on user preferences with smart fallback logic
    */
   async getRandomRecipes(userPreferences) {

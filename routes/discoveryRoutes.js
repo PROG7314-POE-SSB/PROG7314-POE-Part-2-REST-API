@@ -9,6 +9,9 @@ router.get("/random", verifyToken, discoveryController.getRandomRecipes);
 // POST /api/discovery/search - Search recipes based on query and user preferences
 router.post("/search", verifyToken, discoveryController.searchRecipes);
 
+// GET /api/discovery/recipe/:id - Get detailed recipe information by ID
+router.get("/recipe/:id", verifyToken, discoveryController.getRecipeById);
+
 // GET /api/discovery/preferences - Get user preferences (for debugging)
 router.get("/preferences", verifyToken, discoveryController.getUserPreferences);
 

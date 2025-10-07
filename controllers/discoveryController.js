@@ -178,6 +178,64 @@ exports.searchRecipes = async (req, res) => {
 };
 
 /**
+ * Get detailed recipe information by ID
+ * GET /api/discovery/recipe/:id
+ */
+exports.getRecipeById = async (req, res) => {
+  try {
+    const recipeId = req.params.id;
+
+    console.log(`Fetching recipe details for ID: ${recipeId}`);
+
+    // Validate recipe ID
+    if (!recipeId || isNaN(parseInt(recipeId))) {
+      return res.status(400).json({ error: "Valid recipe ID is required" });
+    }
+
+    const numericRecipeId = parseInt(recipeId);
+
+    // Get recipe information from Spoonacular API
+    const spoonacularRecipe = await spoonacularService.getRecipeInformation(
+      numericRecipeId
+    );
+
+    if (!spoonacularRecipe) {
+      return res.status(404).json({
+        error: "Recipe not found",
+        recipeId: numericRecipeId,
+      });
+    }
+
+    // Transform Spoonacular recipe to our recipe model
+    const recipe = new Recipe(spoonacularRecipe);
+
+    console.log(`Successfully fetched recipe: ${recipe.title}`);
+
+    res.status(200).json({
+      message: "Recipe information retrieved successfully",
+      recipeId: numericRecipeId,
+      recipe: recipe,
+    });
+  } catch (error) {
+    console.error("Error fetching recipe information:", error.message);
+
+    // Handle specific Spoonacular API errors
+    if (error.message.includes("404") || error.message.includes("not found")) {
+      return res.status(404).json({
+        error: "Recipe not found",
+        recipeId: req.params.id,
+        details: error.message,
+      });
+    }
+
+    res.status(500).json({
+      error: "Failed to fetch recipe information",
+      details: error.message,
+    });
+  }
+};
+
+/**
  * Get user preferences (for debugging purposes)
  * GET /api/discovery/preferences
  */
