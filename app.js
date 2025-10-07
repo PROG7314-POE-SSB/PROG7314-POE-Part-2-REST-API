@@ -1,3 +1,29 @@
+/*
+ * Code Attribution
+ *
+ * Purpose:
+ *   - Set up an Express-based backend server with route management, middleware integration, and Firebase connectivity.
+ *   - Implement dynamic localtunnel creation for secure public exposure of the local server in development mode.
+ *   - Perform Firebase health checks to ensure Firestore and Auth services are operational before API usage.
+ *   - Manage configuration securely through environment variables.
+ *
+ * Authors/Technologies Used:
+ *   - Express Framework: OpenJS Foundation
+ *   - CORS Middleware: Express.js Community
+ *   - Localtunnel: n8n Open Source Team
+ *   - Firebase Admin SDK: Google Firebase Team
+ *   - dotenv for environment configuration: Motdotla (Open Source)
+ *   - Node.js platform utilities
+ *
+ * References:
+ *   - Express Framework: https://expressjs.com/
+ *   - CORS Middleware: https://github.com/expressjs/cors
+ *   - Localtunnel Documentation: https://github.com/localtunnel/localtunnel
+ *   - Firebase Admin SDK: https://firebase.google.com/docs/admin/setup
+ *   - dotenv Library: https://github.com/motdotla/dotenv
+ *   - Node.js Process Signals: https://nodejs.org/api/process.html#signal-events
+ */
+
 const express = require("express");
 const cors = require("cors");
 const localtunnel = require("@n8n/localtunnel");
@@ -10,8 +36,8 @@ const app = express();
 const authRoutes = require("./routes/authRoutes");
 const healthRoutes = require("./routes/healthRoutes");
 const pantryRoutes = require("./routes/pantryRoutes");
+const discoveryRoutes = require("./routes/discoveryRoutes");
 const verifyToken = require("./middleware/authMiddleware");
-
 
 app.use(cors());
 app.use(express.json());
@@ -19,6 +45,8 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/", healthRoutes);
 app.use("/api/pantry", verifyToken, pantryRoutes);
+app.use("/api/discovery", discoveryRoutes);
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, async () => {

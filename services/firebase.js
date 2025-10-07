@@ -1,4 +1,23 @@
-// services/firebase.js
+/*
+ * Code Attribution
+ *
+ * Purpose:
+ *   - Initialize Firebase Admin SDK using environment variables for secure credential management.
+ *   - Provide access to Firestore and Authentication services.
+ *   - Implement a Firebase health check to verify Firestore read/write and Auth connectivity.
+ *
+ * Authors/Technologies Used:
+ *   - Firebase Admin SDK: Google Firebase Team
+ *   - dotenv for environment configuration: Motdotla (Open Source)
+ *   - Node.js platform utilities
+ *
+ * References:
+ *   - Firebase Admin SDK (Node.js): https://firebase.google.com/docs/admin/setup
+ *   - Firestore Admin Reference: https://firebase.google.com/docs/firestore/manage-data/add-data#node.js
+ *   - Firebase Authentication Admin API: https://firebase.google.com/docs/auth/admin
+ *   - dotenv Library: https://github.com/motdotla/dotenv
+ */
+
 const admin = require("firebase-admin");
 const dotenv = require("dotenv");
 dotenv.config();
