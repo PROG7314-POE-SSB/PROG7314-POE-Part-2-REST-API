@@ -10,8 +10,8 @@ const app = express();
 const authRoutes = require("./routes/authRoutes");
 const healthRoutes = require("./routes/healthRoutes");
 const pantryRoutes = require("./routes/pantryRoutes");
+const shoppingRoutes = require("./routes/shoppingRoutes");
 const verifyToken = require("./middleware/authMiddleware");
-
 
 app.use(cors());
 app.use(express.json());
@@ -19,6 +19,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/", healthRoutes);
 app.use("/api/pantry", verifyToken, pantryRoutes);
+app.use("/api/shopping-list", verifyToken, shoppingRoutes);
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, async () => {
