@@ -1,12 +1,9 @@
 const { db } = require("../services/firebase");
 const admin = require("firebase-admin");
 
-/**
- * Helper: Get Firestore collection reference for a user’s location
- */
-function getCollectionRef(userId, location) {
-  const loc = location.toLowerCase(); // "pantry" | "fridge" | "freezer"
-  return db.collection("pantry").doc(userId).collection(loc);
+// Helper function is simpler now
+function getItemsCollection(userId) {
+  return db.collection("users").doc(userId).collection("pantryItems");
 }
 
 /**
@@ -15,42 +12,32 @@ function getCollectionRef(userId, location) {
  */
 exports.addItem = async (req, res) => {
   try {
-    const userId = req.user.uid; // set by verifyToken middleware
-    const {
-      title,
-      description,
-      imageUrl,
-      expiryDate,
-      quantity,
-      category,
-      location,
-    } = req.body;
+    const userId = req.user.uid;
+    const { title, description, imageUrl, expiryDate, quantity, category, location } = req.body;
 
     if (!title || !quantity || !category || !location) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    const newItemRef = getCollectionRef(userId, location).doc();
+    const itemsCollection = getItemsCollection(userId);
+    const newItemRef = itemsCollection.doc(); // Create a new document reference
 
     const itemData = {
       id: newItemRef.id,
       title,
       description: description || "",
-      imageUrl: imageUrl || "", // Supabase URL provided by client
+      imageUrl: imageUrl || "",
       expiryDate: expiryDate || null,
       quantity: Number(quantity),
       category,
-      location,
+      location, // e.g., "FRIDGE", "FREEZER", "PANTRY"
       addedAt: admin.firestore.FieldValue.serverTimestamp(),
       last_updated: admin.firestore.FieldValue.serverTimestamp(),
     };
 
     await newItemRef.set(itemData);
+    res.status(201).json(itemData); // Return the created item
 
-    res.status(201).json({
-      message: "Item added successfully",
-      item: itemData,
-    });
   } catch (error) {
     console.error("Error adding pantry item:", error);
     res.status(500).json({ error: "Failed to add pantry item" });
@@ -65,19 +52,15 @@ exports.getAllItems = async (req, res) => {
   try {
     const userId = req.user.uid;
 
-    const locations = ["pantry", "fridge", "freezer"];
-    const results = {};
+    const snapshot = await getItemsCollection(userId).orderBy("addedAt", "desc").get();
+    const allItems = snapshot.docs.map((doc) => doc.data());
 
-    for (const loc of locations) {
-      const snapshot = await db
-        .collection("pantry")
-        .doc(userId)
-        .collection(loc)
-        .orderBy("addedAt", "desc")
-        .get();
-
-      results[loc] = snapshot.docs.map((doc) => doc.data());
-    }
+    // Group the items by location for the client
+    const results = {
+      pantry: allItems.filter(item => item.location === 'PANTRY'),
+      fridge: allItems.filter(item => item.location === 'FRIDGE'),
+      freezer: allItems.filter(item => item.location === 'FREEZER'),
+    };
 
     res.status(200).json(results);
   } catch (error) {
@@ -86,34 +69,28 @@ exports.getAllItems = async (req, res) => {
   }
 };
 
+
 /**
  * Get a single item by ID
  * GET /api/pantry/:id
  */
 exports.getItemById = async (req, res) => {
-  try {
-    const userId = req.user.uid;
-    const { id } = req.params;
+    try {
+        const userId = req.user.uid;
+        const { id } = req.params;
 
-    const locations = ["pantry", "fridge", "freezer"];
-    for (const loc of locations) {
-      const docRef = db
-        .collection("pantry")
-        .doc(userId)
-        .collection(loc)
-        .doc(id);
+        const docRef = getItemsCollection(userId).doc(id);
+        const doc = await docRef.get();
 
-      const doc = await docRef.get();
-      if (doc.exists) {
-        return res.status(200).json(doc.data());
-      }
+        if (doc.exists) {
+            return res.status(200).json(doc.data());
+        }
+
+        res.status(404).json({ error: "Item not found" });
+    } catch (error) {
+        console.error("Error fetching item:", error);
+        res.status(500).json({ error: "Failed to fetch item" });
     }
-
-    res.status(404).json({ error: "Item not found" });
-  } catch (error) {
-    console.error("Error fetching item:", error);
-    res.status(500).json({ error: "Failed to fetch item" });
-  }
 };
 
 /**
@@ -126,30 +103,17 @@ exports.updateItem = async (req, res) => {
     const { id } = req.params;
     const updateData = req.body;
 
-    const locations = ["pantry", "fridge", "freezer"];
-    let updated = false;
+    const itemRef = getItemsCollection(userId).doc(id);
+    const doc = await itemRef.get();
 
-    for (const loc of locations) {
-      const itemRef = db
-        .collection("pantry")
-        .doc(userId)
-        .collection(loc)
-        .doc(id);
-
-      const doc = await itemRef.get();
-      if (doc.exists) {
-        await itemRef.update({
-          ...updateData,
-          last_updated: admin.firestore.FieldValue.serverTimestamp(),
-        });
-        updated = true;
-        break;
-      }
-    }
-
-    if (!updated) {
+    if (!doc.exists) {
       return res.status(404).json({ error: "Item not found" });
     }
+
+    await itemRef.update({
+      ...updateData,
+      last_updated: admin.firestore.FieldValue.serverTimestamp(),
+    });
 
     res.status(200).json({ message: "Item updated successfully" });
   } catch (error) {
@@ -167,29 +131,16 @@ exports.deleteItem = async (req, res) => {
     const userId = req.user.uid;
     const { id } = req.params;
 
-    const locations = ["pantry", "fridge", "freezer"];
-    let deleted = false;
+    const itemRef = getItemsCollection(userId).doc(id);
+    const doc = await itemRef.get();
 
-    for (const loc of locations) {
-      const itemRef = db
-        .collection("pantry")
-        .doc(userId)
-        .collection(loc)
-        .doc(id);
-
-      const doc = await itemRef.get();
-      if (doc.exists) {
-        await itemRef.delete();
-        deleted = true;
-        break;
-      }
-    }
-
-    if (!deleted) {
+    if (!doc.exists) {
       return res.status(404).json({ error: "Item not found" });
     }
-
+    
+    await itemRef.delete();
     res.status(200).json({ message: "Item deleted successfully" });
+
   } catch (error) {
     console.error("Error deleting pantry item:", error);
     res.status(500).json({ error: "Failed to delete pantry item" });
