@@ -1,0 +1,51 @@
+name: Node.js CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Set up environment variables
+      env:
+        FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+        FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
+        FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
+        PORT: ${{ secrets.PORT }}
+        NODE_ENV: production
+        DEVELOPER_NAME: ${{ secrets.DEVELOPER_NAME }}
+      run: |
+        echo "FIREBASE_PROJECT_ID=$FIREBASE_PROJECT_ID" >> $GITHUB_ENV
+        echo "FIREBASE_CLIENT_EMAIL=$FIREBASE_CLIENT_EMAIL" >> $GITHUB_ENV
+        echo "FIREBASE_PRIVATE_KEY=$FIREBASE_PRIVATE_KEY" >> $GITHUB_ENV
+        echo "PORT=$PORT" >> $GITHUB_ENV
+        echo "NODE_ENV=production" >> $GITHUB_ENV
+        echo "DEVELOPER_NAME=$DEVELOPER_NAME" >> $GITHUB_ENV
+
+    - name: Start the server
+      run: |
+        nohup npm start &
+        sleep 10
+
+    - name: Test health endpoint
+      run: |
+        curl --fail http://localhost:${{ secrets.PORT || 5000 }}/ || exit 1
